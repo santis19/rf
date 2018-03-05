@@ -311,13 +311,14 @@ class RFStream(Stream):
                 tr.data = tr.data[::-1]
                 tr.stats.onset = tr.stats.starttime + (tr.stats.endtime -
                                                        tr.stats.onset)
-        # Multiply -1 on Q/R and T component, because Q/R component is pointing
-        # towards the event after the rotation. For a positive phase at
-        # a Moho-like velocity contrast, the Q/R component has to
-        # point away from the event.
-        for tr in self:
-            if tr.stats.channel[-1] not in source_components:
-                tr.data = -tr.data
+        # Only on LQT rotation, multiply -1 on Q and T component, because Q
+        # component is pointing towards the event after the rotation.
+        # For a positive phase at a Moho-like velocity contrast, the Q
+        # component has to point away from the event.
+        if rotate == "ZNE->LQT":
+            for tr in self:
+                if tr.stats.channel[-1] not in source_components:
+                    tr.data = -tr.data
         self.type = 'rf'
         if self.method != method:
             self.method = method
